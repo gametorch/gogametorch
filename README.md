@@ -23,7 +23,7 @@ from text prompts and organizes them into projects.
 - Sensible errors with status-code helpers.
 - MIT licensed.
 
-Requires Go 1.27 or newer.
+Requires Go 1.22 or newer.
 
 ## Installation
 
