@@ -25,7 +25,8 @@ type generateFramesBody struct {
 }
 
 // EstimateAnimation estimates the credit cost of an animation run without
-// starting one.
+// starting one. To estimate animating an existing sprite, pass the sprite's
+// asset id with WithBaseAssetID.
 //
 // POST /projects/{project_id}/animation-runs/estimate
 func (c *Client) EstimateAnimation(projectID string) *AnimationEstimateBuilder {
@@ -33,11 +34,18 @@ func (c *Client) EstimateAnimation(projectID string) *AnimationEstimateBuilder {
 }
 
 // GenerateAnimation starts building an animation run.
+//
+// To animate an existing sprite, pass its asset id (from Client.ListSpriteAssets,
+// Client.GetAsset or Generation.Assets) with WithBaseAssetID; omit it to
+// generate the animation from scratch.
+//
+// POST /projects/{project_id}/animation-runs
 func (c *Client) GenerateAnimation(projectID string) *AnimationRunBuilder {
 	return &AnimationRunBuilder{client: c, projectID: projectID}
 }
 
-// ListAnimationRuns lists a project's animation runs.
+// ListAnimationRuns lists a project's animation runs. Set
+// ListParams.BaseAssetID to return only runs based on a given sprite asset.
 //
 // GET /projects/{project_id}/animation-runs
 func (c *Client) ListAnimationRuns(ctx context.Context, projectID string, params *ListParams) (*AnimationsResponse, error) {
@@ -193,7 +201,8 @@ func (b *AnimationEstimateBuilder) WithDuration(duration int64) *AnimationEstima
 	return b
 }
 
-// WithBaseAssetID bases the estimate on an existing asset.
+// WithBaseAssetID bases the estimate on an existing sprite asset. Pass a sprite
+// asset id from Client.ListSpriteAssets, Client.GetAsset or Generation.Assets.
 func (b *AnimationEstimateBuilder) WithBaseAssetID(baseAssetID string) *AnimationEstimateBuilder {
 	b.baseAssetID = &baseAssetID
 	return b
@@ -231,7 +240,8 @@ type AnimationRunBuilder struct {
 	requestID      *string
 }
 
-// WithPrompt sets the generation prompt (required).
+// WithPrompt sets the generation prompt (required). When a base asset is set,
+// the prompt describes the motion to apply to that sprite.
 func (b *AnimationRunBuilder) WithPrompt(prompt string) *AnimationRunBuilder {
 	b.prompt = prompt
 	return b
@@ -249,7 +259,9 @@ func (b *AnimationRunBuilder) WithDuration(duration int64) *AnimationRunBuilder 
 	return b
 }
 
-// WithBaseAssetID animates an existing asset.
+// WithBaseAssetID animates an existing sprite asset instead of generating from
+// scratch. Pass a sprite asset id from Client.ListSpriteAssets, Client.GetAsset
+// or Generation.Assets; the resulting AnimationRun reports it as BaseAssetID.
 func (b *AnimationRunBuilder) WithBaseAssetID(baseAssetID string) *AnimationRunBuilder {
 	b.baseAssetID = &baseAssetID
 	return b

@@ -176,14 +176,42 @@ for {
 }
 ```
 
-## Filtering animations by base image
+## Animating an existing sprite
 
-Animation runs link back to the sprite asset they were generated from via
-`BaseAssetID` (`nil` when generated from scratch). You can filter animation
-queries by it:
+An animation run can be generated from scratch or animated from an existing
+sprite. To keep an animation visually consistent with a sprite, pass the
+sprite's **asset id** as the animation's **base asset**:
 
 ```go
-params := gametorch.NewListParams().WithBaseAssetID(spriteID)
+assets, err := client.ListSpriteAssets(ctx, project.ID, nil)
+if err != nil {
+	return err
+}
+sprite := assets.Assets[0]
+
+// Estimate the cost first, with the same base asset.
+estimate, err := client.EstimateAnimation(project.ID).
+	WithAnimationModel("ash").
+	WithDuration(4).
+	WithBaseAssetID(sprite.ID).
+	Send(ctx)
+
+job, err := client.GenerateAnimation(project.ID).
+	WithPrompt("the hero draws her sword and raises it overhead").
+	WithAnimationModel("ash").
+	WithDuration(4).
+	WithBaseAssetID(sprite.ID). // animate this sprite
+	Send(ctx)
+```
+
+`WithBaseAssetID` takes a **sprite asset id** — the `Asset.ID` from
+`ListSpriteAssets`, `GetAsset` or `Generation.Assets` — not a generation id.
+Omit it to generate from scratch. The resulting run records the reference in
+`AnimationRun.BaseAssetID` (`nil` when generated from scratch), so you can also
+filter runs back to the sprite they were based on:
+
+```go
+params := gametorch.NewListParams().WithBaseAssetID(sprite.ID)
 runs, err := client.ListAnimationRuns(ctx, project.ID, params)
 for _, run := range runs.Animations {
 	fmt.Println(run.ID, run.BaseAssetID)
@@ -261,6 +289,7 @@ go run ./examples/list_projects
 go run ./examples/generate_sprite      # spends credits
 go run ./examples/generate_sound       # spends credits
 go run ./examples/generate_animation   # spends credits
+go run ./examples/animate_sprite       # spends credits; animates a generated sprite
 go run ./examples/export_animation     # read-only; exports every format
 go run ./examples/create_admin_key     # needs an admin key
 go run ./examples/create_project_keys  # needs an admin key
@@ -269,9 +298,10 @@ GAMETORCH_PROJECT=<project-id> go run ./examples/stream_generations
 
 `generate_animation` walks the full animation workflow: generation, frame
 generation, saving a sub-range as a named preset, naming, metadata, labels and
-exporting in every supported format. `create_project_keys` creates a
-project-scoped read-only key and write key with names, spend limits, reset
-cadence and expiry.
+exporting in every supported format. `animate_sprite` shows the reference-image
+flow end to end: generate a sprite, then animate it with `WithBaseAssetID`.
+`create_project_keys` creates a project-scoped read-only key and write key with
+names, spend limits, reset cadence and expiry.
 
 ## Testing
 

@@ -139,8 +139,9 @@ type ListParams struct {
 	Before *string
 	// IncludeArchived includes archived items (defaults to false).
 	IncludeArchived bool
-	// BaseAssetID filters animation runs by their base sprite asset. It is only
-	// used by Client.ListAnimationRuns and ignored by other list endpoints.
+	// BaseAssetID filters animation runs by their base sprite asset (the sprite
+	// asset id passed to GenerateAnimation/WithBaseAssetID). It is only used by
+	// Client.ListAnimationRuns and ignored by other list endpoints.
 	BaseAssetID *string
 }
 

@@ -7,23 +7,26 @@ import (
 
 // AnimationRun is an animation run and its results.
 type AnimationRun struct {
-	ID              string           `json:"id"`
-	ProjectID       string           `json:"project_id"`
-	Prompt          string           `json:"prompt"`
-	AnimationModel  *string          `json:"animation_model"`
-	Duration        *int64           `json:"duration"`
-	Animation       *AnimationAsset  `json:"animation"`
-	Status          string           `json:"status"`
-	CreditsConsumed Decimal          `json:"credits_consumed"`
-	ReservedCredits Decimal          `json:"reserved_credits"`
-	AssetsDelivered BoolOrInt        `json:"assets_delivered"`
-	BaseAssetID     *string          `json:"base_asset_id"`
-	Error           *string          `json:"error"`
-	CreatedAt       time.Time        `json:"created_at"`
-	CompletedAt     *time.Time       `json:"completed_at"`
-	ArchivedAt      *time.Time       `json:"archived_at"`
-	FrameRuns       []FrameRun       `json:"frame_runs"`
-	Frames          []AnimationFrame `json:"frames"`
+	ID              string          `json:"id"`
+	ProjectID       string          `json:"project_id"`
+	Prompt          string          `json:"prompt"`
+	AnimationModel  *string         `json:"animation_model"`
+	Duration        *int64          `json:"duration"`
+	Animation       *AnimationAsset `json:"animation"`
+	Status          string          `json:"status"`
+	CreditsConsumed Decimal         `json:"credits_consumed"`
+	ReservedCredits Decimal         `json:"reserved_credits"`
+	AssetsDelivered BoolOrInt       `json:"assets_delivered"`
+	// BaseAssetID is the id of the sprite asset this run was generated from
+	// (passed to AnimationRunBuilder.WithBaseAssetID), or nil when generated
+	// from scratch.
+	BaseAssetID *string          `json:"base_asset_id"`
+	Error       *string          `json:"error"`
+	CreatedAt   time.Time        `json:"created_at"`
+	CompletedAt *time.Time       `json:"completed_at"`
+	ArchivedAt  *time.Time       `json:"archived_at"`
+	FrameRuns   []FrameRun       `json:"frame_runs"`
+	Frames      []AnimationFrame `json:"frames"`
 	Provenance
 }
 

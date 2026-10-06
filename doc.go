@@ -43,6 +43,22 @@
 // List endpoints take *ListParams and return a page with a next cursor. The
 // Stream* methods return a *Paginator that fetches pages on demand.
 //
+// # Animating an existing sprite
+//
+// An animation run can be generated from scratch or animated from a sprite
+// asset. To keep an animation consistent with a sprite, pass the sprite's asset
+// id with WithBaseAssetID:
+//
+//	assets, err := client.ListSpriteAssets(ctx, project.ID, nil)
+//	job, err := client.GenerateAnimation(project.ID).
+//		WithPrompt("the hero raises her sword").
+//		WithAnimationModel("ash").
+//		WithBaseAssetID(assets.Assets[0].ID).
+//		Send(ctx)
+//
+// The run records the reference as AnimationRun.BaseAssetID (nil when generated
+// from scratch), and ListParams.WithBaseAssetID filters runs back to it.
+//
 // # Errors
 //
 // All fallible operations return *Error, which exposes the HTTP status and API
